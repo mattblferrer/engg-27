@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <iostream> 
+#include <float.h>
 
 using namespace std;
 
@@ -49,17 +50,33 @@ double maximum()
     }
     else if(result == inf_test)  // if equal, then lost precision
     {
-      return result;
+      break;
     }
   }
+  
+  return result;
 }
 
 /**
- * Returns the minimum value that can be stored in a double.
+ * Returns the minimum (+ive) value that can be stored in a double.
 */
 double minimum()
 {
   double result = 1.0;
+  double zero_test = 1.0;  // to test if zero
+  bool isZero = false;
+
+   // find least bit (rough magnitude) of maximum value by iteration
+  while(!isZero)
+  {
+    result = zero_test;
+    zero_test = result / 2;
+    
+    if(zero_test == 0)  // if least bit found
+    {
+      isZero = true;
+    }
+  }
 
   return result;
 }
@@ -67,6 +84,7 @@ double minimum()
 int main()
 {
   cout << maximum() << endl;
+  cout << minimum() << endl;
 
   return 0;
 }
