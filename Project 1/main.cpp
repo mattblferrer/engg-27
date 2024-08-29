@@ -8,15 +8,16 @@
 */
 
 #include <cmath>
-#include <iostream> 
-#include <float.h>
+#include <iostream>
+#include <iomanip>
+#include <cfloat>
 
 using namespace std;
 
 /**
  * Returns the maximum value that can be stored in a double.
 */
-double maximum()
+double compute_largest_value()
 {
   double result = 1.0;
   double inf_test = 1.0;  // to test if infinite
@@ -27,7 +28,7 @@ double maximum()
   {
     result = inf_test;
     inf_test = result * 2;
-    
+
     if(isinf(inf_test))  // if largest bit found
     {
       isInfinite = true;
@@ -53,25 +54,25 @@ double maximum()
       break;
     }
   }
-  
+
   return result;
 }
 
 /**
  * Returns the minimum (+ive) value that can be stored in a double.
 */
-double minimum()
+double compute_smallest_value()
 {
   double result = 1.0;
   double zero_test = 1.0;  // to test if zero
   bool isZero = false;
 
-   // find least bit (rough magnitude) of maximum value by iteration
+   // find least bit (rough magnitude) of minimum value by iteration
   while(!isZero)
   {
     result = zero_test;
     zero_test = result / 2;
-    
+
     if(zero_test == 0)  // if least bit found
     {
       isZero = true;
@@ -83,8 +84,9 @@ double minimum()
 
 int main()
 {
-  cout << maximum() << endl;
-  cout << minimum() << endl;
-
+  cout << "Maximum: " << setprecision(50) << compute_largest_value() 
+    << endl;
+  cout << "Minimum: " << setprecision(50) << compute_smallest_value() 
+    << endl;
   return 0;
 }
