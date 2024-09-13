@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -45,23 +46,51 @@ string validate_filename()
   }
 }
 
+/**
+ * Reads an xy format file and adds the x-coordinates and y-
+ * coordinates to vectors x_i and y_i, respectively. 
+ */
+void read_xy_file(string filename, vector<int>& x_i, 
+  vector<int>& y_i)
+{
+  int lines_read = 0;  // number of lines read in the file
+  double x = 0;
+  double y = 0;
+  string line;
+
+  ifstream xy_file(filename.c_str());  // open file
+  while(getline(xy_file, line))  // extract x, y coordinates per line
+  {
+    stringstream stream(line);
+    if (!(stream >> x))  // no x value found in line
+    {
+      cout << "No x-value found in line " << lines_read + 1 << 
+        "." << endl;
+      break;
+    }
+    if (!(stream >> y))  // no y value found in line
+    {
+      cout << "No y-value found in line " << lines_read + 1 << 
+        "." << endl;
+      break;
+    }
+
+    // if both x and y found
+    x_i.push_back(x);
+    y_i.push_back(y);
+    lines_read++;
+  }
+}
+
 int main()
 {
   // for parsing x-y coordinate file
   vector<int> x_i;  // x-coordinates
   vector<int> y_i;  // y-coordinates
-  double x = 0;
-  double y = 0;
-  string filename = validate_filename();  // get filename from user
-  ifstream xy_file(filename.c_str());
 
-  while(xy_file.good())  // extract x, y coordinates per line
-  {
-    xy_file >> x;
-    xy_file >> y;
-    x_i.push_back(x);
-    y_i.push_back(y);
-  }
+  string filename = validate_filename();  // get filename from user
+  read_xy_file(filename, x_i, y_i);  // read from xy file to vectors
+  
   
   return 0;
 }
