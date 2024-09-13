@@ -80,7 +80,23 @@ void read_xy_file(string filename, vector<int>& x_i,
     y_i.push_back(y);
     lines_read++;
   }
+
+  // information about number of points extracted
+  cout << lines_read << " points extracted." << endl;
 }
+
+/**
+ * This function sets up a representation of systems of equations
+ * using the x-y data obtained from the x-y formatted file. The
+ * solution is a parabola y = ax^2 + bx + c that best fits the data.
+ */
+// TODO: add systems of equations function
+
+/**
+ * This function implements Gaussian elimination on a system of
+ * equations. 
+ */
+// TODO: add Gauss elimination function
 
 int main()
 {
@@ -90,7 +106,6 @@ int main()
 
   string filename = validate_filename();  // get filename from user
   read_xy_file(filename, x_i, y_i);  // read from xy file to vectors
-  
   
   return 0;
 }
