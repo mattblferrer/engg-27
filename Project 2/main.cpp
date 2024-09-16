@@ -91,11 +91,9 @@ void read_xy_file(string filename, vector<double>& x_i,
  * using the x-y data obtained from the x-y formatted file. The
  * solution is a parabola y = ax^2 + bx + c that best fits the data.
  */
-
-void method_of_least_squares(vector<double>& x_i, vector<double>& y_i)
+double** system_of_equations(vector<double>& x_i, vector<double>& y_i)
 {
-  int n = x_i.size();  // number of data points
-  double** system = new double*[3];  // system of equations
+  double** system = new double*[3];  // system of equations matrix
   double* x_sums = new double[5];  // sums of x^(index)
   double* xy_sums = new double[3];  // sums of x^(index) * y
 
@@ -116,7 +114,7 @@ void method_of_least_squares(vector<double>& x_i, vector<double>& y_i)
   }
 
   // get relevant sums of x powers and x powers multiplied by y
-  for (int i = 0; i < n; i++)
+  for (int i = 0; i < x_i.size(); i++)
   {
     for (int power = 0; power < 5; power++)  // x^(index)
     {
@@ -131,12 +129,14 @@ void method_of_least_squares(vector<double>& x_i, vector<double>& y_i)
   // put coefficients and constants of system of equations in array
   for (int i = 0; i < 3; i++)
   {
-    system[i][3] = xy_sums[i];
+    system[i][3] = xy_sums[i];  // constants of system of equations
     for (int j = 0; j < 3; j++)
     {
-      system[i][j] = x_sums[i + (2 - j)];
+      system[i][j] = x_sums[i + (2 - j)];  // coefficients a, b, c
     }
   }
+
+  return system;
 }
 
 /**
@@ -153,7 +153,7 @@ int main()
 
   string filename = validate_filename();  // get filename from user
   read_xy_file(filename, x_i, y_i);  // read from xy file to vectors
-  method_of_least_squares(x_i, y_i);  
+  double** system = system_of_equations(x_i, y_i); 
   
   return 0;
 }
