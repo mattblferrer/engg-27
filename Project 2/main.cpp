@@ -8,6 +8,7 @@
  * ENGG 27 - M
 */
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -50,8 +51,8 @@ string validate_filename()
  * Reads an xy format file and adds the x-coordinates and y-
  * coordinates to vectors x_i and y_i, respectively. 
  */
-void read_xy_file(string filename, vector<int>& x_i, 
-  vector<int>& y_i)
+void read_xy_file(string filename, vector<double>& x_i, 
+  vector<double>& y_i)
 {
   int lines_read = 0;  // number of lines read in the file
   double x = 0;
@@ -90,7 +91,53 @@ void read_xy_file(string filename, vector<int>& x_i,
  * using the x-y data obtained from the x-y formatted file. The
  * solution is a parabola y = ax^2 + bx + c that best fits the data.
  */
-// TODO: add systems of equations function
+
+void method_of_least_squares(vector<double>& x_i, vector<double>& y_i)
+{
+  int n = x_i.size();  // number of data points
+  double** system = new double*[3];  // system of equations
+  double* x_sums = new double[5];  // sums of x^(index)
+  double* xy_sums = new double[3];  // sums of x^(index) * y
+
+  // initialize 2D system of equations array
+  for (int i = 0; i < 3; i++)
+  {
+    system[i] = new double[4];  // ax^2 + bx + c = 0
+  }
+
+  // initialize x_sums and xy_sums
+  for (int i = 0; i < 5; i++)
+  {
+    x_sums[i] = 0;
+  }
+  for (int i = 0; i < 3; i++)
+  {
+    xy_sums[i] = 0;
+  }
+
+  // get relevant sums of x powers and x powers multiplied by y
+  for (int i = 0; i < n; i++)
+  {
+    for (int power = 0; power < 5; power++)  // x^(index)
+    {
+      x_sums[power] += pow(x_i[i], power);
+    }
+    for (int power = 0; power < 3; power++)  // x^(index) * y
+    {
+      xy_sums[power] += pow(x_i[i], power) * y_i[i];
+    }
+  }
+
+  // put coefficients and constants of system of equations in array
+  for (int i = 0; i < 3; i++)
+  {
+    system[i][3] = xy_sums[i];
+    for (int j = 0; j < 3; j++)
+    {
+      system[i][j] = x_sums[i + (2 - j)];
+    }
+  }
+}
 
 /**
  * This function implements Gaussian elimination on a system of
@@ -101,11 +148,12 @@ void read_xy_file(string filename, vector<int>& x_i,
 int main()
 {
   // for parsing x-y coordinate file
-  vector<int> x_i;  // x-coordinates
-  vector<int> y_i;  // y-coordinates
+  vector<double> x_i;  // x-coordinates
+  vector<double> y_i;  // y-coordinates
 
   string filename = validate_filename();  // get filename from user
   read_xy_file(filename, x_i, y_i);  // read from xy file to vectors
+  method_of_least_squares(x_i, y_i);  
   
   return 0;
 }
