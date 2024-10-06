@@ -202,12 +202,12 @@ double** gaussian_elimination(double** system, int max_row,
     {
       system[i][j] = 0;
     }
-    
+
     if (i == 0)  // if first row, no need to back substitute
     {
       continue;
     }
-    
+
     // substitute on row above
     for (int j = i; j < max_column - 1; j++)
     {
@@ -216,8 +216,35 @@ double** gaussian_elimination(double** system, int max_row,
       system[i - 1][j] = 0;
     }
   }
-  
+
   return system;
+}
+
+/**
+ * This function prints the equation of the best-fit parabola to
+ * the given points. 
+ */
+void format_parabola(double** coordinates)
+{
+  // print out coefficients of parabola
+  cout << "The equation of the best-fit parabola is: " << endl;
+  cout << coordinates[0][3] << "x^2";
+  if (coordinates[1][3] < 0)  // negative x coefficient
+  {
+    cout << " - " << abs(coordinates[1][3]) << "x";
+  }
+  else if (coordinates[1][3] > 0)  // positive x coefficient
+  {
+    cout << " + " << coordinates[1][3] << "x";
+  }
+  if (coordinates[2][3] < 0)  // negative constant
+  {
+    cout << " - " << abs(coordinates[2][3]);
+  }
+  else if (coordinates[2][3] > 0)  // positive constant
+  {
+    cout << " + " << coordinates[2][3];
+  }
 }
 
 int main()
@@ -230,12 +257,7 @@ int main()
   read_xy_file(filename, x_i, y_i);  // read from xy file to vectors
   double** system = system_of_equations(x_i, y_i);  
   double** coordinates = gaussian_elimination(system, 3, 4);
-
-  // print out coefficients of parabola
-  cout << "The equation of the best-fit parabola is: " << endl;
-  cout << coordinates[0][3] << "x^2 + ";
-  cout << coordinates[1][3] << "x + ";
-  cout << coordinates[2][3];
+  format_parabola(coordinates);
 
   return 0;
 }
