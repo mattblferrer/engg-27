@@ -141,9 +141,84 @@ double** system_of_equations(vector<double>& x_i, vector<double>& y_i)
 
 /**
  * This function implements Gaussian elimination on a system of
- * equations. 
+ * equations defined by a 2D matrix system. It returns a double array
+ * which represents the coefficients of the solution. 
  */
-// TODO: add Gauss elimination function
+double** gaussian_elimination(double** system, int max_row, 
+                              int max_column)
+{
+  int row = 0;  // row of current pivot
+  int column = 0;  // column of current 
+
+  // convert matrix to row-echelon form
+  while ((row < max_row) && (column < max_column))
+  {
+    // find pivot for current column
+    int pivot = 0;
+    double max_leading = 0;  // maximum leading coefficient in row
+    for (int i = row; i < max_row; i++)
+    {
+      double leading = abs(system[i][column]);
+      if (leading > max_leading) 
+      {
+        max_leading = leading;
+        pivot = i;
+      }
+    }
+
+    // check if need to pivot
+    if (system[pivot][column] == 0)  // no need to pivot if leading 0
+    {
+      column++;
+      continue;
+    }
+
+    // swap pivot row with current row
+    double* temp = system[pivot];
+    system[pivot] = system[row];
+    system[row] = temp;
+
+    // eliminate from all rows below pivot row
+    for (int i = row + 1; i < max_row; i++)
+    {
+      double elim = system[i][column] / system[row][column];
+      system[i][column] = 0;
+      for (int j = column + 1; j < max_column; j++)
+      {
+        system[i][j] -= system[row][j] * elim;
+      }
+    }
+    row++;
+    column++;
+  }
+
+  // perform back substitution on row-echelon matrix 
+  for (int i = max_row - 1; i >= 0; i--)
+  {
+    // express each row in terms of unknown variable in row
+    system[i][max_column - 1] /= system[i][i];
+    system[i][i] = 1;
+    for (int j = i + 1; j < max_column - 1; j++)
+    {
+      system[i][j] = 0;
+    }
+    
+    if (i == 0)  // if first row, no need to back substitute
+    {
+      continue;
+    }
+    
+    // substitute on row above
+    for (int j = i; j < max_column - 1; j++)
+    {
+      double subst = system[j][max_column - 1] * system[i - 1][j];
+      system[i - 1][max_column - 1] -= subst;
+      system[i - 1][j] = 0;
+    }
+  }
+  
+  return system;
+}
 
 int main()
 {
@@ -153,7 +228,14 @@ int main()
 
   string filename = validate_filename();  // get filename from user
   read_xy_file(filename, x_i, y_i);  // read from xy file to vectors
-  double** system = system_of_equations(x_i, y_i); 
-  
+  double** system = system_of_equations(x_i, y_i);  
+  double** coordinates = gaussian_elimination(system, 3, 4);
+
+  // print out coefficients of parabola
+  cout << "The equation of the best-fit parabola is: " << endl;
+  cout << coordinates[0][3] << "x^2 + ";
+  cout << coordinates[1][3] << "x + ";
+  cout << coordinates[2][3];
+
   return 0;
 }
