@@ -33,12 +33,12 @@ string validate_filename()
     if (file.is_open()) // check if file is open (valid file)
     {
       file.close();
-      cout << "File " << filename << " successfully read." << endl;
+      cout << "\nFile " << filename << " successfully read." << endl;
       return filename;
     }
 
     // if invalid filename, repeat input sequence
-    cout << "There was a problem opening the file." << endl;
+    cout << "\nThere was a problem opening the file." << endl;
     cout << "Enter filename of coordinates file ";
     cout << "(Include the extension): ";
     getline(cin, filename);
@@ -65,13 +65,13 @@ void read_xy_file(string filename, vector<double>& x_i,
     stringstream stream(line);
     if (!(stream >> x))  // no x value found in line
     {
-      cout << "No x-value found in line " << lines_read + 1 << 
+      cout << "\nNo x-value found in line " << lines_read + 1 << 
         "." << endl;
       break;
     }
     if (!(stream >> y))  // no y value found in line
     {
-      cout << "No y-value found in line " << lines_read + 1 << 
+      cout << "\nNo y-value found in line " << lines_read + 1 << 
         "." << endl;
       break;
     }
@@ -227,7 +227,7 @@ double** gaussian_elimination(double** system, int max_row,
 void format_parabola(double** coordinates)
 {
   // print out coefficients of parabola
-  cout << "The equation of the best-fit parabola is: " << endl;
+  cout << "\nThe equation of the best-fit parabola is: " << endl;
   cout << coordinates[0][3] << "x^2";
   if (coordinates[1][3] < 0)  // negative x coefficient
   {
@@ -252,6 +252,9 @@ int main()
   // for parsing x-y coordinate file
   vector<double> x_i;  // x-coordinates
   vector<double> y_i;  // y-coordinates
+
+  cout << "Parabolic Fit" << endl;
+  cout << "Ferrer, Bernardo\n" << endl;
 
   string filename = validate_filename();  // get filename from user
   read_xy_file(filename, x_i, y_i);  // read from xy file to vectors
