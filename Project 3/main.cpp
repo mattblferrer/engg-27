@@ -110,63 +110,25 @@ bool extract_coefficients(string filename, int& degree,
 }
 
 /**
- * Gets the number of iterations from the user and checks that it 
- * is valid.
-*/
-int validate_iterations()
-{
-  string input;
-  int iterations;
-  cout << "\nEnter number of iterations: ";
-  stringstream stream;
-
-  while (true)  // loop until valid input
-  {
-    getline(cin, input);
-    stream.str(input);
-    stream.clear();
-    if (!(stream >> iterations))
-    {
-      cout << "\nInvalid input. Please enter a valid number: ";
-    }
-    else 
-      if (iterations < 1)
-      {
-        cout << "\nInvalid input. Please enter iterations ";
-        cout << "above 0: ";
-      } 
-      else
-        if (stream >> input)
-        {
-          cout << "\nInvalid input. Please enter a valid number: ";
-        }
-        else 
-          break;
-  }
-  
-  cout << "Valid number of iterations." << endl;
-  return iterations;
-}
-
-/**
  * Solves for the roots of the polynomial using the Durand-Kerner
  * method. 
 */
 complex<double>* determine_roots(int& degree, 
-  vector<double>& coefficients, int& iterations)
+  vector<double>& coefficients)
 {
   complex<double>* roots = new complex<double>[degree];
   complex<double>* W = new complex<double>[degree];
+  complex<double>* prev = new complex<double>[degree];
   complex<double> base(0.4, 0.9); // arbitrary starting point
-  
+
   // first iteration x_i (0)
   for(int i = 0; i < degree; i++)
   {
     roots[i] = pow(base, i);
+    prev[i] = roots[i];
   }
 
-  // loop iterations
-  for (int k = 0; k < iterations; k++)
+  while (true)
   {
     // Weierstrass correction
     for (int i = 0; i < degree; i++) // ith root
@@ -188,15 +150,28 @@ complex<double>* determine_roots(int& degree,
       }
       W[i] = p_i / W[i];
     }
-    
+
     // next iteration x_i (k + 1) from x_i (k)
     for (int i = 0; i < degree; i++)
     {
+      prev[i] = roots[i];
       roots[i] -= W[i];
     }
+
+    // check if all roots are solved
+    bool allSolved = true;
+    for (int i = 0; i < degree; i++)
+    {
+      if (abs(prev[i] - roots[i]) > 1e-15)
+      {
+        allSolved = false;
+      }
+    }
+    if (allSolved)
+    {
+      return roots;
+    }
   }  
-  
-  return roots;
 }
 
 /**
@@ -207,7 +182,7 @@ complex<double>* evaluate_polynomial(int& degree,
   vector<double>& coefficients, complex<double>* roots)
 {
   complex<double>* eval = new complex<double>[degree];
-  
+
   for (int i = 0; i < degree; i++)
   {
     for (int j = 0; j <= degree; j++) // per term
@@ -293,7 +268,7 @@ void print_roots(string filename, int& degree,
             cout << "f(";
             cout << real(roots[i]) << " + " << imag(roots[i]) << "i";
           }
-      
+
       cout << ") = ";
 
       if (imag(eval[i]) == 0)
@@ -348,24 +323,27 @@ int menu()
     cout << "2. Display instructions" << endl;
     cout << "3. Quit" << endl;
     cout << "Enter menu: ";
-    
+
     getline(cin, input);
     stream.str(input);
     stream.clear();
-    
+
     if (!(stream >> choice))
     {
-      cout << "\nInvalid input. Please enter a valid number." << endl;
+      cout << "\nInvalid input. Please enter a valid number." 
+        << endl;
     }
     else
       if (choice > 3 || choice < 1)
       {
-        cout << "\nInvalid input. Please enter a number from 1-3." << endl;
+        cout << "\nInvalid input. Please enter a number from 1-3." 
+          << endl;
       }
       else
         if (stream >> input)
         {
-          cout << "\nInvalid input. Please enter a valid number." << endl;
+          cout << "\nInvalid input. Please enter a valid number." 
+            << endl;
         }
         else
           break;
@@ -408,7 +386,6 @@ int main()
   vector<double> coefficients;
   string filename;
   int degree;
-  int iterations;
   cout << setprecision(15);
 
   while(true)
@@ -423,9 +400,9 @@ int main()
         filename = validate_input_filename();
       }
 
-      iterations = validate_iterations();
-      complex<double>* roots = determine_roots(degree, coefficients, iterations);
-      complex<double>* eval = evaluate_polynomial(degree, coefficients, roots);
+      complex<double>* roots = determine_roots(degree, coefficients);
+      complex<double>* eval = evaluate_polynomial(degree, 
+        coefficients, roots);
       filename = validate_output_filename();
       print_roots(filename, degree, roots, eval);
     }
